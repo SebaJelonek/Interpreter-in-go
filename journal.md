@@ -110,3 +110,11 @@
   - `peek()` could be extended to check multiple characters (`++`, `+=`, etc.)
 
 ---
+
+## 5th of September 2025
+
+### Running the first test
+  
+  - bash command *go test ./lexer -v*
+  - tests in go operate on package level
+
