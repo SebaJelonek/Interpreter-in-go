@@ -22,7 +22,13 @@ func New(input string) *Lexer {
 
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
+	var literal []string
 	l.ch = l.readChar()
+
+	if isLetter(l.ch) {
+		literal = l.readIdentifier(l.ch)
+	}
+	log.Println(literal)
 
 	switch rune(l.ch) {
 	case '(':
@@ -66,6 +72,24 @@ func (l *Lexer) readChar() byte {
 	//and returns it
 	// additionally moves position and read position by 1
 
+}
+
+func isLetter(char byte) bool {
+	return (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || char == '_')
+}
+
+func (l *Lexer) readIdentifier(char byte) []string {
+	var literal []string
+
+	for isLetter(char) || isNumber(char) {
+
+	}
+
+	return literal
+}
+
+func isNumber(char byte) bool {
+	return (char >= '0' && char <= '9')
 }
 
 func (l *Lexer) peek() byte {
