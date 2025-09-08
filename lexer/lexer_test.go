@@ -80,6 +80,7 @@ func TestLexert(t *testing.T) {
 		if testCase.expectedLiteral != lexerToken.Literal {
 			t.Fatalf("test[%d] - literal wrong\n expected=%q, got=%q", i, testCase.expectedLiteral, lexerToken.Literal)
 		}
+		t.Log("TEST PASSED", i+1)
 	}
 
 }

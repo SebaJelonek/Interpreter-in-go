@@ -33,3 +33,9 @@ const (
 	LBRACE = "{"
 	RBRACE = "}"
 )
+
+var Keywords = map[string]TokenType{
+	"let":      LET,
+	"function": FUNCTION,
+	"if":       IF,
+}

@@ -2,14 +2,15 @@ package lexer
 
 import (
 	"log"
+	"strings"
 
 	"github.com/SebaJelonek/Interpreter-in-go/token"
 )
 
 type Lexer struct {
 	input        string
-	position     int  // current char position (index)
-	readPosition int  // next char position (index+1)
+	position     int  // current char position (index) for read
+	readPosition int  // next char position (index+1) for peek
 	ch           byte // current char
 }
 
@@ -21,14 +22,30 @@ func New(input string) *Lexer {
 }
 
 func (l *Lexer) NextToken() token.Token {
-	var tok token.Token
-	var literal []string
-	l.ch = l.readChar()
-
-	if isLetter(l.ch) {
-		literal = l.readIdentifier(l.ch)
+	if l.ch == 32 {
+		l.readChar()
 	}
-	log.Println(literal)
+	// this does not work... i will try to fix it today
+
+	var tok token.Token
+
+	var literal string
+	l.ch = l.readChar() // reading char at the very beginning
+	log.Println("this is char`", string(l.ch))
+	log.Println("this is byte`", l.ch)
+
+	if isLetter(l.ch) { //is the char a letter/underscore?
+		literal = l.readIdentifier()
+		log.Println("the litteral", literal)
+		tok = literalToToken(literal)
+		log.Println("the token", tok)
+		return tok
+	} else if isNumber(l.ch) {
+		literal = l.readIdentifier()
+		log.Println("the number ident", literal)
+		tok = literalToToken(literal)
+		log.Println("the token number", tok)
+	}
 
 	switch rune(l.ch) {
 	case '(':
@@ -50,18 +67,19 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok = token.Token{Type: token.EOF, Literal: ""}
 	}
-
+	log.Println("the token", tok)
 	return tok
 } //this function builds tokens with chars which are comming from readChar()
 
 func (l *Lexer) readChar() byte {
 	var char byte
+
 	if l.readPosition >= len(l.input) {
 		char = 0
 		return char
 	}
+
 	char = l.input[l.position]
-	log.Println(rune(char))
 	//but token takes in string as literal because it would only work on operators
 	l.position++
 	l.readPosition++
@@ -70,26 +88,47 @@ func (l *Lexer) readChar() byte {
 	//basic char function
 	//takes char from current position
 	//and returns it
-	// additionally moves position and read position by 1
-
+	//additionally moves position and read position by 1
 }
 
 func isLetter(char byte) bool {
 	return (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z' || char == '_')
 }
-
-func (l *Lexer) readIdentifier(char byte) []string {
-	var literal []string
-
-	for isLetter(char) || isNumber(char) {
-
-	}
-
-	return literal
-}
-
 func isNumber(char byte) bool {
 	return (char >= '0' && char <= '9')
+}
+
+func (l *Lexer) readIdentifier() string {
+	var literal []string
+	// literal = append(literal, string(char)) //<- append the char consumed by nexttoken to slice
+	// //so this is not needed
+	for isLetter(l.ch) || isNumber(l.ch) /*<-check the first char which comes from */ {
+		literal = append(literal, string(l.ch)) // <- we append "old" char, the one read last iteration
+		l.ch = l.readChar()                     //<- if this is number or letter we carry on and go back to top
+		//if it is not we break out of loop through initial condition...
+		// literal = append(literal, string(char)) <- this is an issue... we append the "new" char
+	}
+	return strings.Join(literal, "") //and return literal
+}
+
+func literalToToken(literal string) token.Token {
+	var tok token.Token
+
+	val, ok := token.Keywords[literal]
+	if ok {
+		tok.Literal = literal
+		tok.Type = val
+	} else if isNumber(literal[0]) {
+		tok.Literal = literal
+		tok.Type = token.INT
+	} else {
+		tok.Literal = literal
+		tok.Type = token.IDENT
+	}
+
+	// now we else
+
+	return tok
 }
 
 func (l *Lexer) peek() byte {
