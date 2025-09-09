@@ -40,10 +40,12 @@ func TestLexert(t *testing.T) {
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
 		{token.IDENT, "ten"},
+		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
 		{token.IDENT, "add"},
+		{token.ASSIGN, "="},
 		{token.FUNCTION, "fn"},
 		{token.LPAREN, "("},
 		{token.IDENT, "x"},
@@ -54,6 +56,7 @@ func TestLexert(t *testing.T) {
 		{token.IDENT, "x"},
 		{token.PLUS, "+"},
 		{token.IDENT, "y"},
+		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
 		{token.LET, "let"},
@@ -66,6 +69,7 @@ func TestLexert(t *testing.T) {
 		{token.IDENT, "ten"},
 		{token.RPAREN, ")"},
 		{token.SEMICOLON, ";"},
+		{token.EOF, ""},
 	}
 
 	lexer := New(input)
@@ -74,7 +78,7 @@ func TestLexert(t *testing.T) {
 		lexerToken := lexer.NextToken()
 
 		if testCase.expectedType != lexerToken.Type {
-			t.Fatalf("test[%d] - token type wrong\n expected=%q, got=%q", i, testCase.expectedType, lexerToken.Type)
+			t.Fatalf("test[%d] - token type wrong\n expected=%q, got=%q, literl=%q", i, testCase.expectedType, lexerToken.Type, lexerToken.Literal)
 		}
 
 		if testCase.expectedLiteral != lexerToken.Literal {

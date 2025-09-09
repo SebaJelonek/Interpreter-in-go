@@ -22,17 +22,13 @@ func New(input string) *Lexer {
 }
 
 func (l *Lexer) NextToken() token.Token {
-	if l.ch == 32 {
-		l.readChar()
-	}
-	// this does not work... i will try to fix it today
-
+	log.Println("this is byte at the begining", l.ch)
+	l.skipWhiteSpace()
+	// this does not work... i will try to fix it today... tomorrow today
 	var tok token.Token
-
 	var literal string
-	l.ch = l.readChar() // reading char at the very beginning
-	log.Println("this is char`", string(l.ch))
-	log.Println("this is byte`", l.ch)
+	log.Println("this is char:", string(l.ch))
+	log.Println("this is byte:", l.ch)
 
 	if isLetter(l.ch) { //is the char a letter/underscore?
 		literal = l.readIdentifier()
@@ -45,27 +41,37 @@ func (l *Lexer) NextToken() token.Token {
 		log.Println("the number ident", literal)
 		tok = literalToToken(literal)
 		log.Println("the token number", tok)
+		return tok
 	}
 
 	switch rune(l.ch) {
 	case '(':
 		tok = token.Token{Type: token.LPAREN, Literal: string(l.ch)}
+		l.readChar()
 	case ')':
 		tok = token.Token{Type: token.RPAREN, Literal: string(l.ch)}
+		l.readChar()
 	case '+':
 		tok = token.Token{Type: token.PLUS, Literal: string(l.ch)}
+		l.readChar()
 	case ',':
 		tok = token.Token{Type: token.COMMA, Literal: string(l.ch)}
+		l.readChar()
 	case ';':
 		tok = token.Token{Type: token.SEMICOLON, Literal: string(l.ch)}
+		l.readChar()
 	case '=':
 		tok = token.Token{Type: token.ASSIGN, Literal: string(l.ch)}
+		l.readChar()
 	case '{':
 		tok = token.Token{Type: token.LBRACE, Literal: string(l.ch)}
+		l.readChar()
 	case '}':
 		tok = token.Token{Type: token.RBRACE, Literal: string(l.ch)}
+		l.readChar()
 	case 0:
 		tok = token.Token{Type: token.EOF, Literal: ""}
+		l.readChar()
 	}
 	log.Println("the token", tok)
 	return tok
@@ -83,6 +89,7 @@ func (l *Lexer) readChar() byte {
 	//but token takes in string as literal because it would only work on operators
 	l.position++
 	l.readPosition++
+	l.ch = char // reading char at the very beginning
 
 	return char
 	//basic char function
@@ -136,3 +143,9 @@ func (l *Lexer) peek() byte {
 	nextChar := l.input[l.readPosition]
 	return nextChar
 } //this function peeks into l.readPosition
+
+func (l *Lexer) skipWhiteSpace() {
+	for l.ch == 32 || l.ch == 9 || l.ch == 10 {
+		l.readChar()
+	}
+}

@@ -129,7 +129,6 @@
 ### **Refining My `NextToken()` Logic**
 
 - **`NextToken()` pseudo-code:**
-
   - Skip any whitespace first.
   - Look at the current character (`l.ch`).
   - If `isLetter(l.ch)` is true:
@@ -148,7 +147,7 @@
 
 - **Upcoming Steps:** The plan is to fully implement the `readIdentifier()`, `readNumber()`, and `lookupIdent()` methods. This will complete the core lexer functionality and allow me to move on to the parser.
 
-## 9th of September 2025
+## 8th of September 2025
 ### Lexer Development
 
   - **Handling Multi-Character Tokens:** The primary focus today was on making the lexer correctly handle tokens that are more than one character long, specifically identifiers and numbers. My previous NextToken function only handled single-character operators, but now it needs to group characters like let and five into a single token.
@@ -174,3 +173,27 @@
       - My tests were failing because the lexer was trying to process spaces.
       - This highlighted the need for a `skipWhitespace()` helper function. This function will contain a simple loop to advance the lexer's position past any space, tab, or newline characters.
       - Calling `skipWhitespace()` at the beginning of `NextToken()` will ensure the lexer is always positioned at the start of a meaningful token. This is a crucial step for a robust lexer.
+
+---
+
+## 9th of September 2025
+
+### Debugging the Lexer
+
+  **Handling Whitespace:**
+  - Figured out how to correctly handle all types of whitespace, including tabs and spaces. This fixed the initial error where the lexer was expecting a `LET` token but found a blank one.
+
+  **Preventing Double-Reads:**
+  - Identified the off-by-one bug where the lexer would read certain characters twice. The fix was to make the `readChar` function responsible for advancing the state, ensuring that `NextToken` always starts with a fresh character.
+
+  **Recognizing Keywords:**
+  - Successfully implemented the logic to check if a valid identifier, like `fn`, is a reserved keyword. This fixed the last remaining issue where the lexer was incorrectly returning an `IDENT` token instead of a `FUNCTION` token.
+
+ - Test for input:
+    `let five = 5;`
+    `let ten = 10;`
+    `let add = fn(x, y) {`
+    `x + y;`
+    `};`
+    `let result = add(five, ten);`
+  PASSED
