@@ -6,16 +6,9 @@ import (
 	"github.com/SebaJelonek/Interpreter-in-go/token"
 )
 
-func TestLexert(t *testing.T) {
+func TestLexer(t *testing.T) {
 	input := `=+(){},;`
-	input = `	let five = 5;
-				let ten = 10;
-				let add = fn(x, y) {
-					x + y;
-				};
-				let result = add(five, ten);`
-
-	tests := []struct {
+	test := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
@@ -29,7 +22,31 @@ func TestLexert(t *testing.T) {
 		{token.SEMICOLON, ";"},
 	}
 
-	tests = []struct {
+	lexer := New(input)
+
+	for i, testCase := range test {
+		lexerToken := lexer.NextToken()
+
+		if testCase.expectedType != lexerToken.Type {
+			t.Fatalf("test[%d] - token type wrong\n expected=%q, got=%q, literl=%q", i, testCase.expectedType, lexerToken.Type, lexerToken.Literal)
+		}
+
+		if testCase.expectedLiteral != lexerToken.Literal {
+			t.Fatalf("test[%d] - literal wrong\n expected=%q, got=%q", i, testCase.expectedLiteral, lexerToken.Literal)
+		}
+		t.Log("TEST PASSED", i+1)
+	}
+
+}
+func TestNextToken(t *testing.T) {
+	input := `	let five = 5;
+				let ten = 10;
+				let add = fn(x, y) {
+					x + y;
+				};
+				let result = add(five, ten);
+				`
+	test := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
@@ -74,7 +91,7 @@ func TestLexert(t *testing.T) {
 
 	lexer := New(input)
 
-	for i, testCase := range tests {
+	for i, testCase := range test {
 		lexerToken := lexer.NextToken()
 
 		if testCase.expectedType != lexerToken.Type {
@@ -86,5 +103,4 @@ func TestLexert(t *testing.T) {
 		}
 		t.Log("TEST PASSED", i+1)
 	}
-
 }

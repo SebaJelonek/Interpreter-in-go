@@ -30,21 +30,7 @@ func (l *Lexer) NextToken() token.Token {
 	log.Println("this is char:", string(l.ch))
 	log.Println("this is byte:", l.ch)
 
-	if isLetter(l.ch) { //is the char a letter/underscore?
-		literal = l.readIdentifier()
-		log.Println("the litteral", literal)
-		tok = literalToToken(literal)
-		log.Println("the token", tok)
-		return tok
-	} else if isNumber(l.ch) {
-		literal = l.readIdentifier()
-		log.Println("the number ident", literal)
-		tok = literalToToken(literal)
-		log.Println("the token number", tok)
-		return tok
-	}
-
-	switch rune(l.ch) {
+	switch l.ch {
 	case '(':
 		tok = token.Token{Type: token.LPAREN, Literal: string(l.ch)}
 		l.readChar()
@@ -71,7 +57,18 @@ func (l *Lexer) NextToken() token.Token {
 		l.readChar()
 	case 0:
 		tok = token.Token{Type: token.EOF, Literal: ""}
-		l.readChar()
+	default: //the char is one of above chars letter/underscore/number?
+		if isLetter(l.ch) || isNumber(l.ch) {
+			literal = l.readIdentifier()
+			log.Println("the litteral", literal)
+			tok = literalToToken(literal)
+			log.Println("the token", tok)
+			log.Println(l.position)
+			return tok
+		} else {
+			tok = token.Token{Type: token.ILLEGAL, Literal: string(l.ch)}
+			return tok
+		}
 	}
 	log.Println("the token", tok)
 	return tok
@@ -81,6 +78,7 @@ func (l *Lexer) readChar() byte {
 	var char byte
 
 	if l.readPosition >= len(l.input) {
+		l.ch = 0
 		char = 0
 		return char
 	}
@@ -134,7 +132,6 @@ func literalToToken(literal string) token.Token {
 	}
 
 	// now we else
-
 	return tok
 }
 
